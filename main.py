@@ -1,10 +1,10 @@
 #from cleaning import *
 from functions import *
 
-def main(url):
-    data = pd.read_csv("bank-additional/bank-additional.csv", sep = ";")# inputs
+def main(path):
+    data = pd.read_csv(path)# inputs
     #data = pd.read_csv(url, sep = ";") 
-    data = clean(data) # pretraitemnt des donnees
+    #data = clean(data) # pretraitemnt des donnees
 
     n = data.shape[0]
 
@@ -37,4 +37,4 @@ def main(url):
     #afficher(c1, c2, w1, w2, cor, "ACP NON NORMÉE") # affichage du graphe
 
 if __name__ == "__main__":
-    main("ma")
+    main("dataset.csv")
