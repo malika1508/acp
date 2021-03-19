@@ -1,0 +1,215 @@
+
+============================= les outils utilisés ==================================
+
+pandas :  def
+numpy  :  def
+matplotlib : def
+tkinter : def
+
+=============================analyse du dataset =====================================
+// capture dataset.shape ()
+
+Nombre d'instances: 41188 (lignes) 
+Nombre d'attributs: 20 + attribut de sortie(21 colonnes).
+
+// capture 
+	s = 0
+	for att in dataset : 
+		filt = dataset[att] == “unknown”
+		s += len(dataset[filt])
+s = nbr des ligne contenant val == unknown
+
+
+description du jeu de données:
+1. Titre: Marketing bancaire (avec contexte social / économique)
+
+2. Sources
+   Créé par: Sérgio Moro (ISCTE-IUL), Paulo Cortez (Univ. Minho) et Paulo Rita (ISCTE-IUL) @ 2014
+   
+3. Utilisation passée:
+  L'ensemble de données complet (bank-additional-full.csv) a été décrit et analysé pour prédire le succès du télémarketing bancaire. Systèmes d'aide à la décision (2014)
+
+4. Informations sur les attributs:
+
+# données clients bancaires:
+   1 - âge (numérique)
+   2 - emploi: type d'emploi (catégoriel: "admin.", "Cols bleus", "entrepreneur", "femme de ménage", "direction", "retraité", "indépendant", "services", "étudiant" , "technicien", "chômeur", "inconnu")
+   3 - matrimonial: état matrimonial (catégorique: «divorcé», «marié», «célibataire», «inconnu»; note: «divorcé» signifie divorcé ou veuf)
+   4 - éducation (catégorique: "basic.4y", "basic.6y", "basic.9y", "high.school", "illettré", "cours professionnel", "diplôme universitaire", "inconnu")
+   5 - défaut: le crédit est-il en défaut? (catégorique: "non", "oui", "inconnu")
+   6 - logement: un prêt au logement?
+   7 - Prêt: a-t-il un prêt personnel?
+# lié au dernier contact de la campagne en cours:
+   8 - contact: type de communication de contact
+   9 - mois: dernier mois de contact de l'année
+  10 - day_of_week: dernier jour de contact de la semaine
+  11 - durée: durée du dernier contact, en secondes (numérique). Remarque importante: cet attribut affecte fortement la cible de sortie (par exemple, si durée = 0, y = "non"). Pourtant, la durée n'est pas connue avant qu'un appel ne soit effectué. De plus, après la fin de l'appel, y est évidemment connu. Ainsi, cette entrée ne devrait être incluse qu'à des fins de référence et devrait être écartée si l'intention est d'avoir un modèle prédictif réaliste.
+# autres attributs:
+  12 - campagne: nombre de contacts réalisés pendant cette campagne et pour ce client (numérique, inclut le dernier contact)
+  13 - jours: nombre de jours qui se sont écoulés après la dernière fois que le client a été contacté à partir d'une campagne précédente (numérique; 999 signifie que le client n'a pas été contacté précédemment)
+  14 - précédent: nombre de contacts réalisés avant cette campagne et pour ce client (numérique)
+  15 - poutcome: résultat de la campagne marketing précédente (catégorique: "échec", "inexistant", "succès")
+# attributs du contexte social et économique
+  16 - taux var.emp.: taux de variation de l'emploi - indicateur trimestriel (numérique)
+  17 - cons.price.idx: indice des prix à la consommation - indicateur mensuel (numérique)
+  18 - cons.conf.idx: indice de confiance des consommateurs - indicateur mensuel (numérique)
+  19 - euribor3m: taux euribor 3 mois - indicateur journalier (numérique)
+  20 - nombre d'employés: nombre d'employés
+  21 - y: qui identifie la sortie (catégorique: "oui", "non") 
+
+parmi les 20 variables on a 
+        10 variables quantitaves: ('age', 'duration', 
+                                    'campaign', 'pdays', 'previous','emp.var.rate', 
+                                    'cons.price.idx', 'cons.conf.idx', 'euribor3m',
+                                    'nr.employed')
+        11 variables qualitatives:  ('contact', 'marital', 'education', "day_of_week", 
+                                        'job', 'default', 'loan', 'housing', 'poutcome',
+                                        'month', 'y')
+
+=======================la structure du code source =======================================
+	notre programmes est constituée de 3 fichiers .py
+1 ere fichier : interface.py pour l interface graphique
+2 eme fichier : functions.py contient toutes les fonctions nécessaires pour la construction d’une acp
+3 âme fichier : main.py c est un fichier qui coordonne le travail et relie entre le front et le back (fait des appels au fonctions(dans functions.py) puis affiche les résultats)
+
+===================pretraitement des donnees =======================================================
+
+	sachant que la technique ACP permet d’explorer des jeux de données multidimensionnels constitués de variables quantitatives seulement.vus que notre jeu de donne est composé de ces deux types de variables et on plus il y’a des valeurs manquantes dans les colonnes contenant des valeurs non numeric, donc on va supprimer ces colonnes.
+	Apres la suppression des variables qualitatives on se retrouve avec un matrice de données de 41188 lignes (individus) et 9 colonnes (variables) et qui ne contient aucune valeur manquante 
+ ====> cette étape est implementée dans la fonction clean() du fichier functions
+
+et dans ce cas notre jeu de données et prête pour commencer l étude (wal ma3labalich)
+
+
+
+
+===================== description des différentes fonctions dans le fichier functions.py ======================
+
+1 - centrer :c’est une fonctions qui :
+		prend en paramètre la matrice de données (data) et le nombre de lignes (n)
+ 		retoure un matrice centrée
+	* on a récupéré la moyenne de chaque colonne (centre de gravite)
+	* puis cree la matrice 1ng’
+	* et en fin la matrice centré = data - 1ng’
+
+2 - centrer et réduire: c’est une fonctions qui :
+		prend en paramètre une matrice qui est déjà centrée (data) et le nombre de lignes (n)
+ 		retourne un matrice centrée et réduite
+	* on a récupéré l’écart-type de chaque colonne
+	* puis on a crée la matrice de même taille que la matrice centre et qui contient dans chaque colonne l’écart-type associé a la 		matrice centre
+	* et en fin pour chaque cellule de la matrice on la divise avec sont écart-type
+
+3 - var_covar :c’est une fonctions qui :
+		prend en paramètre une matrice qui est déjà centrée (data) et le nombre de lignes (n)
+ 		retourne un matrice de variance/covariance
+	* on a calculé y_prime = la transpose de Y 
+	* on calcule le produit matricielle (y_prim, y)
+	* puis pour chaque cellule on la divise par 1/n  (V = 1/n * Y’ * Y))
+
+4 - corr : c est une fonctions qui :
+		prend en paramètre une matrice centrée et réduite (Z) et le nombre de lignes (n)
+ 		retourne un matrice de corrélation
+	* on a calculé z_prime = la transpose de Z 
+	* on calcule le produit matricielle (z_prim, z)
+	* puis pour chaque cellule on la divise par 1/n  (R = 1/n * Z’ * Z))
+
+5 - diago : c’est une fonctions qui :
+		prend en paramètre  une matrice carrée (soit une matrice de variance/covariance ou une matrice de corrélation )
+ 		retourne les valeurs et vecteurs propres
+	* nous avons utilisé la fonctions predefinit dans numpy.linalg : np.linalg.eig(x)
+
+6 - composantes_principales : c’est une fonctions qui :
+		prend en paramètre  
+			# une matrice (soit une centrée ou une matrice centrée et réduite ) :(mat)
+			# des valeurs et vecteurs propres 
+   (	si c’est une matrice centrée on passe les vecteurs et valeurs propres de la matrice var/ covar
+	sinon on passe les vecteurs et valeurs propres de la matrice de corrélation	)
+		retourne 4 vecteurs:
+			# projection des individus sur axe 1
+    			# projection des individus sur axe 2
+    			# projection des anciennes variables sur axe 1
+    			# projection des anciennes variables sur axe 2
+	*chaque projection est calculée comme suite:
+		- Ci = dot(mat, Ui) => projection des individus sur l’axe i
+		- Wi = racine(val) * Ui => projection des variables sur l’axe i
+
+7- corr_compo :  c’est une fonctions qui :
+		prend en paramètre  
+			# une matrice carrée (soit une matrice de variance/covariance ou une matrice de corrélation ) : (mat)
+			# les valeurs propres associées a cette matrice
+			# les vecteurs propres associées a cette matrice
+ 		retourne une matrice qui contient des coeffition de corrélations entre les anciennes et nouvelles variables
+	*chaque coeffition de corrélation est calculée comme suite:
+		a = racine(vals[i])
+		b = écart-type(colonne[j])
+		c = U[i][j] (U : un vecteur propre)
+		coeff(la colonne[j], composante[i]) = a * c /b
+
+8 - var (): c’est une fonctions qui :
+		prend en paramètre un vecteur
+		retourne sa variance
+	elle nous a aider dans les calcules de la fonction corr_compo
+
+9 - affichage:  c’est une fonctions qui :
+		prend en paramètre  
+			# projection des individus sur axe 1
+    			# projection des individus sur axe 2
+    			# projection des anciennes variables sur axe 1
+    			# projection des anciennes variables sur axe 2
+			# la matrice de corrélation entre  les anciennes et nouvelles variables
+		ne retourne rien
+	on utilisant matlotlib
+	affiche dans les individus et les variables sur les nouveaux axes factorielles
+	et affiche le cercle de corrélation entre  les anciennes et nouvelles variables
+
+10 -  interprétation : c’est une fonctions qui :
+		prend en paramètre  :
+			# des valeurs propres
+			# des vecteur propre 
+	cette fonction qui n’a aucune relation avec les affichage mais elle nous aide dans l’interprétation et l’analyse de 		la qualité de représentation. elle permet de calculer 
+	* l’inertie totale
+	* l’inertie explique par chaque axe
+	* afficher le graphique scree plot qui nous aide a chercher la dimension de notre nouvel espace d'individu (on va voir ça dans la phase intepretation)
+	* Contribution apportée par les individus
+
+ ======================== le fichier interface.py ==========================
+
+ ======================== le fichier main.py ===============================
+
+ qui contient une fonction main :
+		prend en paramètre 
+			#le path du dataset (path)
+			# une valeur boolean pour indique si on construit une acp normée ou non normée (norme)
+	cette	 fonction fait coordonner entre les différentes fonctions dans functions.py 
+
+	1. Lire les données en utilisant pandas data = pd.read_csv(path)
+	2. nettoyer le jeu de données (data = clean(data))
+	3. recupérer le nombre de lignes de la matrice  
+	4. construire une matrice centrée Y (centre(data,n))
+	5. construire une matrice centrée et réduite Z (centre_reduite(data,n))
+	6. construire une matrice de variance/covariance V (var_covar(Y,n))
+	7. construire une matrice de corrélation R (centre_reduite(Z,n))
+	si on cherche une ACP norme :
+		1. calculer des valeurs, vecteurs propres (diago(R))
+		2. calculer des composantes principale (composantes_principales(Z, vals, vects))
+		3. calculer le coeffition de corrélation entre les anciennes et nouvelles variables(corr_compo(Y, vals, vects))
+	sinon : 
+		1. calculer des valeurs, vecteurs propres (diago(V))
+		2. calculer des composantes principale (composantes_principales(Y, vals, vects))
+		3. calculer le coeffition de corrélation entre les anciennes et nouvelles variables(corr_compo(Y, vals, vects))
+
+	8. afficher les resultats obtenus (afficher(c1, c2, w1, w2, cor))
+
+
+==================== Interprétation ==================================
+================ACP NORME :
+
+
+inertie total = 10
+inertie expliqué par chaque axe: // capture inertie explique par chaque axe:
+le graphique scree plot  // capture elbow
+	 le graphique scree plot représente en abscisse les composantes et en ordonnée les valeurs propres.on utilisant le critère Eboulis des valeurs propres : “on cherche un «coude » dans le graphe des valeurs propres” on constate que la nouvelle dimension	est(2*2) on utilisant 2 valeurs lamnda(ta3bir raki jidan mdrr a refaire )
+
+	on a cree de axes factorieles 
+
+ 
